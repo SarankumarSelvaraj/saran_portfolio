@@ -14,19 +14,19 @@ export const About: React.FC = () => {
       icon: <BusinessCenterIcon sx={{ fontSize: 40, color: theme.palette.primary.main }} />,
       value: '3+ Years',
       label: 'Experience at SRM Tech',
-      desc: 'Building reliable enterprise apps',
+      desc: 'Production-grade web & mobile delivery',
     },
     {
       icon: <CodeIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />,
       value: 'Full Stack',
       label: 'MERN & React Native',
-      desc: 'Hybrid apps & backend scale',
+      desc: 'Web portals, mobile apps & backend services',
     },
     {
       icon: <DevicesIcon sx={{ fontSize: 40, color: theme.palette.primary.light }} />,
-      value: '5+ Products',
+      value: '7+ Products',
       label: 'Enterprise Scale',
-      desc: 'Admin portals, companion apps, & core solutions',
+      desc: 'Super-apps, AI platforms, IoT & chatbot builder',
     },
   ];
 
@@ -67,16 +67,16 @@ export const About: React.FC = () => {
           <Grid size={{ xs: 12, md: 6 }}>
             <ScrollReveal direction="left">
               <Typography variant="h4" sx={{ mb: 3, fontWeight: 700, fontSize: { xs: '1.5rem', md: '2rem' } }}>
-                Passionate Programmer Analyst & App Architect
+                Full-Stack & Mobile Developer | MERN Stack | React Native
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3, lineHeight: 1.8 }}>
-                As a Programmer Analyst at <strong>SRM Tech</strong> for the past 3+ years, I've had the privilege of developing, scaling, and maintaining complex enterprise-grade web and mobile ecosystems. I specialize in bridging the gap between elegant user experience design and solid backend engineering.
+                As a <strong>Software Engineer at SRM Tech</strong> for 3+ years, I've designed and delivered production-grade web and mobile applications across healthcare, AI meeting intelligence, smart classrooms, and chatbot platforms. I specialise in bridging clean user experiences with robust backend engineering.
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3, lineHeight: 1.8 }}>
-                My technical sweet spot centers around the <strong>MERN stack</strong> and <strong>React Native</strong>. Whether it's crafting real-time interactive dashboards with WebSockets, engineering offline-resilient local sync mechanics for health platforms, or deploying automated IoT setups, I am driven by writing clean, highly maintaining TypeScript codebase structures.
+                My stack centres on the <strong>MERN stack</strong> and <strong>React Native</strong>. I've architected a 5-app healthcare super-app (HealthMate), an AI-powered meeting platform (SmartMeet) with real-time WebSocket transcription and IoT device integration, a no-code chatbot builder (SRM Global), and a backend recording-automation microservice — all in TypeScript.
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                I work closely with product managers, QA testers, and hardware engineers to architect products that deliver exceptional value. I thrive in agile cultures that prioritize coding excellence, robust testing pipelines, and responsive design systems.
+                I thrive in Agile teams, building reusable component libraries, implementing complex auth systems (JWT, Firebase OTP, RBAC), and optimising performance with <strong>RTK Query</strong>, <strong>AWS S3</strong> pipelines, and offline-resilient Redux architectures.
               </Typography>
             </ScrollReveal>
           </Grid>
