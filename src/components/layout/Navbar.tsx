@@ -18,6 +18,7 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import { ThemeToggleButton } from '../common/ThemeToggleButton';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavItem {
   label: string;
@@ -38,40 +39,58 @@ const navItems: NavItem[] = [
 export const Navbar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>('hero');
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+      setScrolled(window.scrollY > 50);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  // IntersectionObserver for active section tracking
+  useEffect(() => {
+    const sectionIds = navItems.map((item) => item.id);
+    const observers: IntersectionObserver[] = [];
+
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    sectionIds.forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) {
+        const observer = new IntersectionObserver(observerCallback, {
+          rootMargin: '-40% 0px -55% 0px',
+          threshold: 0,
+        });
+        observer.observe(element);
+        observers.push(observer);
+      }
+    });
+
+    return () => observers.forEach((obs) => obs.disconnect());
+  }, []);
+
+  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
   const handleScrollToSection = (id: string) => {
     setMobileOpen(false);
     const element = document.getElementById(id);
     if (element) {
-      const offset = 80; // height of navbar
+      const offset = 80;
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = element.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
       const offsetPosition = elementPosition - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth',
-      });
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
     }
   };
 
@@ -80,81 +99,137 @@ export const Navbar: React.FC = () => {
       <AppBar
         position="fixed"
         sx={{
-          background: scrolled 
-            ? (theme.palette.mode === 'dark' ? 'rgba(11, 15, 25, 0.85)' : 'rgba(255, 255, 255, 0.85)')
+          background: scrolled
+            ? theme.palette.mode === 'dark'
+              ? 'rgba(11, 15, 25, 0.88)'
+              : 'rgba(255, 255, 255, 0.88)'
             : 'transparent',
-          backdropFilter: scrolled ? 'blur(16px)' : 'none',
-          boxShadow: scrolled ? theme.shadows[4] : 'none',
-          borderBottom: scrolled 
-            ? `1px solid ${theme.palette.divider}` 
-            : '1px solid transparent',
-          transition: 'all 0.3s ease-in-out',
+          backdropFilter: scrolled ? 'blur(20px) saturate(180%)' : 'none',
+          boxShadow: scrolled
+            ? theme.palette.mode === 'dark'
+              ? '0 1px 0 rgba(255,255,255,0.06), 0 4px 32px rgba(0,0,0,0.4)'
+              : '0 1px 0 rgba(0,0,0,0.06), 0 4px 32px rgba(0,0,0,0.08)'
+            : 'none',
+          borderBottom: scrolled ? `1px solid ${theme.palette.divider}` : '1px solid transparent',
+          transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ justifyContent: 'space-between', height: scrolled ? 70 : 88, transition: 'height 0.3s' }}>
-            {/* Logo / Brand Name */}
-            <Typography
-              variant="h5"
-              noWrap
-              component="div"
-              onClick={() => handleScrollToSection('hero')}
-              sx={{
-                mr: 2,
-                display: 'flex',
-                fontFamily: '"Outfit", sans-serif',
-                fontWeight: 800,
-                background: theme.palette.gradient?.primary,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                cursor: 'pointer',
-                letterSpacing: '-0.03em',
-              }}
-            >
-              SARANKUMAR S
-            </Typography>
+          <Toolbar
+            disableGutters
+            sx={{
+              justifyContent: 'space-between',
+              height: scrolled ? 68 : 88,
+              transition: 'height 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
+            {/* Logo */}
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <Typography
+                variant="h5"
+                noWrap
+                component="div"
+                onClick={() => handleScrollToSection('hero')}
+                sx={{
+                  fontFamily: '"Outfit", sans-serif',
+                  fontWeight: 800,
+                  background: theme.palette.gradient?.primary,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  cursor: 'pointer',
+                  letterSpacing: '-0.03em',
+                  userSelect: 'none',
+                }}
+              >
+                SARANKUMAR S
+              </Typography>
+            </motion.div>
 
             {/* Desktop Navigation */}
             {!isMobile && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                {navItems.map((item) => (
-                  <Button
-                    key={item.id}
-                    onClick={() => handleScrollToSection(item.id)}
-                    sx={{
-                      color: theme.palette.text.primary,
-                      fontSize: '0.95rem',
-                      fontWeight: 600,
-                      px: 2,
-                      py: 1,
-                      borderRadius: '8px',
-                      '&:hover': {
-                        background: theme.palette.primary.main,
-                        color: '#ffffff',
-                      },
-                    }}
-                  >
-                    {item.label}
-                  </Button>
-                ))}
-                <Box sx={{ ml: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                {navItems.map((item) => {
+                  const isActive = activeSection === item.id;
+                  return (
+                    <Box key={item.id} sx={{ position: 'relative' }}>
+                      <Button
+                        onClick={() => handleScrollToSection(item.id)}
+                        sx={{
+                          color: isActive ? theme.palette.primary.main : theme.palette.text.primary,
+                          fontSize: '0.9rem',
+                          fontWeight: isActive ? 700 : 600,
+                          px: 1.8,
+                          py: 1,
+                          borderRadius: '8px',
+                          background: isActive
+                            ? theme.palette.mode === 'dark'
+                              ? 'rgba(129, 140, 248, 0.12)'
+                              : 'rgba(79, 70, 229, 0.08)'
+                            : 'transparent',
+                          transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                          '&:hover': {
+                            background:
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(129, 140, 248, 0.15)'
+                                : 'rgba(79, 70, 229, 0.08)',
+                            color: theme.palette.primary.main,
+                          },
+                        }}
+                      >
+                        {item.label}
+                      </Button>
+                      {/* Active underline indicator */}
+                      <AnimatePresence>
+                        {isActive && (
+                          <motion.div
+                            layoutId="activeNavIndicator"
+                            initial={{ opacity: 0, scaleX: 0 }}
+                            animate={{ opacity: 1, scaleX: 1 }}
+                            exit={{ opacity: 0, scaleX: 0 }}
+                            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                            style={{
+                              position: 'absolute',
+                              bottom: 2,
+                              left: '20%',
+                              right: '20%',
+                              height: 2,
+                              borderRadius: 2,
+                              background: theme.palette.gradient?.primary,
+                            }}
+                          />
+                        )}
+                      </AnimatePresence>
+                    </Box>
+                  );
+                })}
+                <Box sx={{ ml: 1.5 }}>
                   <ThemeToggleButton size="medium" />
                 </Box>
               </Box>
             )}
 
-            {/* Mobile Burger and Toggle */}
+            {/* Mobile */}
             {isMobile && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <ThemeToggleButton size="small" />
                 <IconButton
                   color="inherit"
                   aria-label="open drawer"
-                  edge="start"
                   onClick={handleDrawerToggle}
                   sx={{ color: theme.palette.text.primary }}
                 >
-                  <MenuIcon />
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
+                      key={mobileOpen ? 'close' : 'open'}
+                      initial={{ rotate: -90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: 90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      style={{ display: 'flex' }}
+                    >
+                      {mobileOpen ? <CloseIcon /> : <MenuIcon />}
+                    </motion.div>
+                  </AnimatePresence>
                 </IconButton>
               </Box>
             )}
@@ -172,48 +247,98 @@ export const Navbar: React.FC = () => {
           paper: {
             sx: {
               width: 280,
-              background: theme.palette.background.default,
+              background:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(11, 15, 25, 0.97)'
+                  : 'rgba(255, 255, 255, 0.97)',
+              backdropFilter: 'blur(20px)',
+              borderLeft: `1px solid ${theme.palette.divider}`,
               p: 3,
             },
-          }
+          },
         }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Typography variant="h6" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 800 }}>
-            Menu
+          <Typography
+            variant="h6"
+            sx={{
+              fontFamily: '"Outfit", sans-serif',
+              fontWeight: 800,
+              background: theme.palette.gradient?.primary,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            Navigation
           </Typography>
-          <IconButton onClick={handleDrawerToggle}>
+          <IconButton onClick={handleDrawerToggle} size="small">
             <CloseIcon />
           </IconButton>
         </Box>
 
-        <List>
-          {navItems.map((item) => (
-            <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
-              <ListItemButton
-                onClick={() => handleScrollToSection(item.id)}
-                sx={{
-                  borderRadius: '10px',
-                  '&:hover': {
-                    background: theme.palette.primary.main,
-                    color: '#ffffff',
-                    '& .MuiListItemText-primary': {
-                      color: '#ffffff',
-                    },
-                  },
-                }}
+        <List sx={{ p: 0 }}>
+          {navItems.map((item, index) => {
+            const isActive = activeSection === item.id;
+            return (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
               >
-                <ListItemText
-                  primary={
-                    <Typography sx={{ fontSize: '1.1rem', fontWeight: 600, color: theme.palette.text.primary }}>
-                      {item.label}
-                    </Typography>
-                  }
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                <ListItem disablePadding sx={{ mb: 0.5 }}>
+                  <ListItemButton
+                    onClick={() => handleScrollToSection(item.id)}
+                    sx={{
+                      borderRadius: '10px',
+                      background: isActive
+                        ? theme.palette.mode === 'dark'
+                          ? 'rgba(129, 140, 248, 0.12)'
+                          : 'rgba(79, 70, 229, 0.08)'
+                        : 'transparent',
+                      borderLeft: isActive
+                        ? `3px solid ${theme.palette.primary.main}`
+                        : '3px solid transparent',
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        background:
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(129, 140, 248, 0.15)'
+                            : 'rgba(79, 70, 229, 0.08)',
+                      },
+                    }}
+                  >
+                    <ListItemText
+                      primary={
+                        <Typography
+                          sx={{
+                            fontSize: '1rem',
+                            fontWeight: isActive ? 700 : 600,
+                            color: isActive ? theme.palette.primary.main : theme.palette.text.primary,
+                          }}
+                        >
+                          {item.label}
+                        </Typography>
+                      }
+                    />
+                  </ListItemButton>
+                </ListItem>
+              </motion.div>
+            );
+          })}
         </List>
+
+        <Box
+          sx={{
+            pt: 4,
+            borderTop: `1px solid ${theme.palette.divider}`,
+            mt: 4,
+          }}
+        >
+          <Typography variant="caption" color="text.secondary">
+            © {new Date().getFullYear()} Sarankumar S
+          </Typography>
+        </Box>
       </Drawer>
     </>
   );

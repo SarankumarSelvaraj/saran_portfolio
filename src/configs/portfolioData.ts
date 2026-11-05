@@ -267,44 +267,56 @@ export const skillsData: SkillCategory[] = [
 
 export const certifications: Certification[] = [
   {
+    title: 'Front-End Development Libraries',
+    issuer: 'freeCodeCamp',
+    issueDate: 'Oct 21, 2026',
+    credentialUrl:
+      'https://freecodecamp.org/certification/fccbd3c498e-ca19-4fc2-8e1e-f1fe81b418bf/front-end-development-libraries-v9',
+  },
+  {
+    title: 'Back-End Development and APIs',
+    issuer: 'freeCodeCamp',
+    issueDate: 'Oct 21, 2026',
+    credentialUrl:
+      'https://freecodecamp.org/certification/fccbd3c498e-ca19-4fc2-8e1e-f1fe81b418bf/back-end-development-and-apis-v9',
+  },
+  {
+    title: 'Linux Unhatched',
+    issuer: 'Cisco Networking Academy',
+    issueDate: 'Jul 21, 2026',
+    credentialUrl: 'https://www.netacad.com',
+  },
+  {
     title: 'Introduction to Agent Skills',
     issuer: 'Anthropic',
     issueDate: '2025',
+    credentialUrl: 'https://www.anthropic.com',
   },
   {
     title: 'Claude 101',
     issuer: 'Anthropic',
     issueDate: '2025',
+    credentialUrl: 'https://www.anthropic.com',
   },
   {
     title: 'AI Fluency: Framework & Foundations',
     issuer: 'Anthropic',
     issueDate: '2025',
+    credentialUrl: 'https://www.anthropic.com',
   },
   {
-    title: 'Responsive Web Design',
+    title: 'Legacy JavaScript Algorithms and Data Structures V7',
     issuer: 'freeCodeCamp',
-    issueDate: '2022',
+    issueDate: 'Dec 19, 2022',
+    credentialUrl:
+      'https://freecodecamp.org/certification/fccba61327a-3a52-45d7-89e7-a1b1da8c098e/javascript-algorithms-and-data-structures',
   },
   {
-    title: 'Legacy JavaScript Algorithms and Data Structures',
+    title: 'Legacy Responsive Web Design V8',
     issuer: 'freeCodeCamp',
-    issueDate: '2022',
-  },
-  {
-    title: 'Linux Unhatched',
-    issuer: 'Cisco / NetAcad',
-    issueDate: '2026',
-  },
-  {
-    title: 'Front-End Development Libraries Certification',
-    issuer: 'freeCodeCamp',
-    issueDate: '2026',
-  },
-  {
-    title: 'Back-End Development and APIs Certification',
-    issuer: 'freeCodeCamp',
-    issueDate: '2026',
+    issueDate: 'Sep 26, 2021',
+    credentialUrl:
+      'https://freecodecamp.org/certification/fccbd3c498e-ca19-4fc2-8e1e-f1fe81b418bf/responsive-web-design',
   },
 ];
 
