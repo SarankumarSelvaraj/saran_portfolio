@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Box, Container, Typography, Grid, TextField, Button, CardContent,
+  Box, Container, Typography, Grid, TextField, Button,
   Stack, IconButton, Snackbar, Alert, useTheme, CircularProgress,
 } from '@mui/material';
 import EmailIcon from '@mui/icons-material/Email';
@@ -9,43 +9,43 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import SendIcon from '@mui/icons-material/Send';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { profileInfo } from '../../configs/portfolioData';
-import { GlassCard } from '../common/GlassCard';
-import { ScrollReveal } from '../common/ScrollReveal';
 import { SectionHeading } from '../common/SectionHeading';
+import { ScrollReveal } from '../common/ScrollReveal';
 import { motion, AnimatePresence } from 'framer-motion';
 
+/* ── Social link config ── */
 const SOCIAL_META = [
-  { platform: 'GitHub', Icon: GitHubIcon, color: '#6e5494', bg: 'rgba(110,84,148,0.15)' },
-  { platform: 'LinkedIn', Icon: LinkedInIcon, color: '#0A66C2', bg: 'rgba(10,102,194,0.15)' },
-  { platform: 'Email', Icon: EmailIcon, color: '#EA4335', bg: 'rgba(234,67,53,0.15)' },
-];
-
-const inputSx = (isDark: boolean, primaryMain: string, primaryLight: string) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '16px',
-    background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-    transition: 'all 0.25s ease',
-    '& fieldset': {
-      borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)',
-      transition: 'all 0.25s ease',
-    },
-    '&:hover fieldset': { borderColor: primaryLight },
-    '&.Mui-focused': {
-      background: isDark ? 'rgba(99,102,241,0.05)' : 'rgba(79,70,229,0.03)',
-      boxShadow: isDark
-        ? `0 0 0 3px rgba(129,140,248,0.2), 0 0 20px rgba(129,140,248,0.1)`
-        : `0 0 0 3px rgba(79,70,229,0.15), 0 0 20px rgba(79,70,229,0.07)`,
-    },
-    '&.Mui-focused fieldset': { borderColor: primaryMain, borderWidth: 2 },
+  {
+    platform: 'GitHub',
+    Icon: GitHubIcon,
+    color: '#E4E4E7',
+    dimColor: 'rgba(228,228,231,0.08)',
+    borderColor: 'rgba(228,228,231,0.15)',
+    label: 'GitHub',
   },
-  '& .MuiInputLabel-root.Mui-focused': { color: primaryMain },
-});
+  {
+    platform: 'LinkedIn',
+    Icon: LinkedInIcon,
+    color: '#38BDF8',
+    dimColor: 'rgba(56,189,248,0.1)',
+    borderColor: 'rgba(56,189,248,0.2)',
+    label: 'LinkedIn',
+  },
+  {
+    platform: 'Email',
+    Icon: EmailIcon,
+    color: '#FB7185',
+    dimColor: 'rgba(251,113,133,0.1)',
+    borderColor: 'rgba(251,113,133,0.2)',
+    label: 'Email',
+  },
+];
 
 export const Contact: React.FC = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
-  const sx = inputSx(isDark, theme.palette.primary.main, theme.palette.primary.light);
 
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -57,210 +57,460 @@ export const Contact: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) {
-      setStatus('error'); setToastOpen(true); return;
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      setStatus('error');
+      setToastOpen(true);
+      return;
     }
     setStatus('loading');
     setTimeout(() => {
-      setStatus('success'); setToastOpen(true);
+      setStatus('success');
+      setToastOpen(true);
       setFormData({ name: '', email: '', subject: '', message: '' });
     }, 1800);
   };
 
-  return (
-    <Box id="contact" sx={{ py: { xs: 8, md: 14 }, position: 'relative', overflow: 'hidden' }}>
-      {/* BG shape decorations */}
-      <Box sx={{
-        position: 'absolute', top: '10%', right: '-5%',
-        width: 400, height: 400, borderRadius: '50%',
-        background: isDark
-          ? 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)'
-          : 'radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-      <Box sx={{
-        position: 'absolute', bottom: '5%', left: '-5%',
-        width: 350, height: 350, borderRadius: '50%',
-        background: isDark
-          ? 'radial-gradient(circle, rgba(52,211,153,0.1) 0%, transparent 70%)'
-          : 'radial-gradient(circle, rgba(16,185,129,0.07) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
+  /* Shared text field styles */
+  const fieldSx = {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '12px',
+      background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+      transition: 'all 0.2s ease',
+      '& fieldset': {
+        borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+        transition: 'border-color 0.2s ease',
+      },
+      '&:hover fieldset': {
+        borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: isDark ? '#8B5CF6' : '#7C3AED',
+        borderWidth: '1.5px',
+      },
+      '&.Mui-focused': {
+        boxShadow: isDark
+          ? '0 0 0 3px rgba(139,92,246,0.15)'
+          : '0 0 0 3px rgba(124,58,237,0.1)',
+      },
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: isDark ? '#8B5CF6' : '#7C3AED',
+    },
+    '& .MuiInputBase-input': {
+      color: 'text.primary',
+      fontSize: '0.9rem',
+    },
+  };
 
+  return (
+    <Box
+      id="contact"
+      sx={{
+        py: { xs: 10, md: 16 },
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         <SectionHeading
-          index="08"
+          index="07"
           eyebrow="Get In Touch"
-          title="Contact Me"
-          subtitle="Open to engineering roles, consulting, or ambitious collaborations. Let's build something exceptional."
+          title="Let's Work Together"
+          subtitle="Open to new engineering roles, consulting, and ambitious product collaborations. I respond within 24 hours."
         />
 
-        <Grid container spacing={5} sx={{ alignItems: 'stretch' }}>
-          {/* ── Left: info ── */}
+        <Grid container spacing={4} sx={{ alignItems: 'stretch' }}>
+
+          {/* ── Left column: info panel ── */}
           <Grid size={{ xs: 12, md: 5 }}>
             <ScrollReveal direction="left">
-              <GlassCard hoverEffect={false} accentColor="primary" sx={{ height: '100%' }}>
-                <CardContent sx={{ p: { xs: 3, md: 4.5 }, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  <Typography variant="h4" sx={{ fontWeight: 800, mb: 1.5, fontSize: { xs: '1.45rem', md: '1.7rem' }, lineHeight: 1.2 }}>
-                    Let's build something{' '}
-                    <Box component="span" sx={{
-                      background: theme.palette.gradient?.primary,
-                      WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                    }}>
-                      exceptional
-                    </Box>{' '}together
-                  </Typography>
-                  <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4, lineHeight: 1.85, fontSize: '0.95rem' }}>
-                    I'm always open to exploring new engineering roles, consulting opportunities, or collaborating on innovative React Native & Full Stack projects.
+              <Box
+                sx={{
+                  height: '100%',
+                  borderRadius: '20px',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'}`,
+                  background: isDark ? '#16161F' : '#FFFFFF',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                {/* Top gradient band */}
+                <Box sx={{
+                  height: 2,
+                  background: 'linear-gradient(90deg, #8B5CF6, #38BDF8)',
+                }} />
+
+                <Box sx={{ p: { xs: 3, md: 4 }, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                  {/* Heading */}
+                  <Typography
+                    sx={{
+                      fontFamily: '"Outfit", sans-serif',
+                      fontWeight: 800,
+                      fontSize: { xs: '1.5rem', md: '1.75rem' },
+                      lineHeight: 1.15,
+                      color: 'text.primary',
+                      mb: 1.5,
+                      letterSpacing: '-0.025em',
+                    }}
+                  >
+                    Ready to build{' '}
+                    <Box
+                      component="span"
+                      sx={{
+                        background: isDark
+                          ? 'linear-gradient(135deg, #8B5CF6, #38BDF8)'
+                          : 'linear-gradient(135deg, #7C3AED, #0284C7)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                      }}
+                    >
+                      something great?
+                    </Box>
                   </Typography>
 
-                  {/* Contact detail items */}
-                  <Stack spacing={3} sx={{ mb: 4 }}>
+                  <Typography
+                    sx={{
+                      color: 'text.secondary',
+                      fontSize: '0.9rem',
+                      lineHeight: 1.75,
+                      mb: 4,
+                    }}
+                  >
+                    Whether you're looking for a Senior React Native engineer, a full-stack MERN developer, or someone to architect your next product — let's talk.
+                  </Typography>
+
+                  {/* Contact details */}
+                  <Stack spacing={2.5} sx={{ mb: 4 }}>
                     {[
-                      { icon: <EmailIcon sx={{ fontSize: 20 }} />, grad: 'linear-gradient(135deg,#6366F1,#8B5CF6)', neon: 'rgba(99,102,241,0.4)', label: 'Email', value: profileInfo.email, href: `mailto:${profileInfo.email}` },
-                      { icon: <LocationOnIcon sx={{ fontSize: 20 }} />, grad: 'linear-gradient(135deg,#10B981,#06B6D4)', neon: 'rgba(16,185,129,0.4)', label: 'Location', value: profileInfo.location, href: undefined },
+                      {
+                        icon: <EmailIcon sx={{ fontSize: '1rem' }} />,
+                        label: 'Email',
+                        value: profileInfo.email,
+                        href: `mailto:${profileInfo.email}`,
+                        color: '#FB7185',
+                        dimColor: 'rgba(251,113,133,0.1)',
+                        borderColor: 'rgba(251,113,133,0.2)',
+                      },
+                      {
+                        icon: <LocationOnIcon sx={{ fontSize: '1rem' }} />,
+                        label: 'Location',
+                        value: profileInfo.location + ' · UTC+5:30',
+                        href: undefined,
+                        color: '#34D399',
+                        dimColor: 'rgba(52,211,153,0.1)',
+                        borderColor: 'rgba(52,211,153,0.2)',
+                      },
                     ].map(item => (
-                      <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
-                        <Box sx={{
-                          width: 44, height: 44, borderRadius: '14px', flexShrink: 0,
-                          background: item.grad,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          boxShadow: `0 6px 20px ${item.neon}`,
-                          color: '#fff',
-                          '&::after': {
-                            content: '""', position: 'absolute', inset: 0, borderRadius: '14px',
-                            background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%)',
+                      <Box
+                        key={item.label}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 2,
+                          p: 2,
+                          borderRadius: '12px',
+                          border: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+                          background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            borderColor: item.borderColor,
+                            background: isDark
+                              ? item.dimColor
+                              : item.dimColor.replace('0.1', '0.07'),
                           },
-                          position: 'relative',
+                        }}
+                      >
+                        <Box sx={{
+                          width: 36, height: 36, borderRadius: '9px', flexShrink: 0,
+                          background: isDark ? item.dimColor : item.dimColor.replace('0.1', '0.08'),
+                          border: `1px solid ${item.borderColor}`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: item.color,
                         }}>
                           {item.icon}
                         </Box>
                         <Box>
-                          <Typography variant="caption" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary', display: 'block', fontSize: '0.65rem', mb: 0.2 }}>
+                          <Typography sx={{
+                            fontSize: '0.65rem', fontWeight: 600,
+                            textTransform: 'uppercase', letterSpacing: '0.1em',
+                            color: 'text.disabled', mb: 0.25,
+                          }}>
                             {item.label}
                           </Typography>
                           {item.href ? (
-                            <Typography component="a" href={item.href} variant="body2" sx={{ fontWeight: 600, color: 'text.primary', textDecoration: 'none', transition: 'color 0.2s', '&:hover': { color: 'primary.main' } }}>
+                            <Typography
+                              component="a"
+                              href={item.href}
+                              sx={{
+                                fontSize: '0.875rem', fontWeight: 600,
+                                color: 'text.primary', textDecoration: 'none',
+                                transition: 'color 0.15s',
+                                '&:hover': { color: item.color },
+                              }}
+                            >
                               {item.value}
                             </Typography>
                           ) : (
-                            <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>{item.value}</Typography>
+                            <Typography sx={{ fontSize: '0.875rem', fontWeight: 500, color: 'text.primary' }}>
+                              {item.value}
+                            </Typography>
                           )}
                         </Box>
                       </Box>
                     ))}
                   </Stack>
 
-                  {/* Social icons */}
+                  {/* Social links */}
                   <Box sx={{ mt: 'auto' }}>
-                    <Typography variant="caption" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary', display: 'block', mb: 2, fontSize: '0.68rem' }}>
-                      Connect On
+                    <Typography sx={{
+                      fontSize: '0.65rem', fontWeight: 600,
+                      textTransform: 'uppercase', letterSpacing: '0.12em',
+                      color: 'text.disabled', mb: 2,
+                    }}>
+                      Find me on
                     </Typography>
-                    <Stack direction="row" spacing={1.5}>
+                    <Stack direction="row" spacing={1}>
                       {profileInfo.socialLinks.map(link => {
                         const meta = SOCIAL_META.find(s => s.platform === link.platform);
                         if (!meta) return null;
-                        const { Icon } = meta;
                         return (
-                          <motion.div key={link.platform} whileHover={{ y: -5, scale: 1.12 }} whileTap={{ scale: 0.9 }} transition={{ type: 'spring', stiffness: 300 }}>
+                          <motion.div
+                            key={link.platform}
+                            whileHover={{ y: -3 }}
+                            whileTap={{ scale: 0.93 }}
+                            transition={{ duration: 0.15 }}
+                          >
                             <IconButton
-                              href={link.url} target="_blank" rel="noopener noreferrer"
-                              aria-label={link.platform}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label={meta.label}
+                              size="small"
                               sx={{
-                                width: 44, height: 44, borderRadius: '12px',
-                                background: isDark ? meta.bg : `${meta.color}10`,
-                                border: `1px solid ${meta.color}44`,
+                                width: 42, height: 42, borderRadius: '10px',
+                                background: isDark ? meta.dimColor : meta.dimColor.replace('0.1', '0.07'),
+                                border: `1px solid ${meta.borderColor}`,
                                 color: meta.color,
-                                transition: 'all 0.25s',
+                                transition: 'all 0.2s ease',
                                 '&:hover': {
-                                  background: meta.bg,
+                                  background: meta.dimColor.replace('0.1', '0.2'),
                                   borderColor: meta.color,
-                                  boxShadow: `0 8px 20px ${meta.color}44`,
+                                  boxShadow: `0 6px 18px ${meta.dimColor.replace('0.1', '0.35')}`,
                                 },
                               }}
                             >
-                              <Icon fontSize="small" />
+                              <meta.Icon sx={{ fontSize: '1rem' }} />
                             </IconButton>
                           </motion.div>
                         );
                       })}
                     </Stack>
                   </Box>
-                </CardContent>
-              </GlassCard>
+
+                  {/* Availability notice */}
+                  <Box
+                    sx={{
+                      mt: 3,
+                      p: 2,
+                      borderRadius: '12px',
+                      background: isDark ? 'rgba(52,211,153,0.07)' : 'rgba(5,150,105,0.05)',
+                      border: `1px solid ${isDark ? 'rgba(52,211,153,0.2)' : 'rgba(5,150,105,0.15)'}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1.5,
+                    }}
+                  >
+                    <Box sx={{
+                      width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                      background: '#34D399',
+                      boxShadow: '0 0 6px #34D399',
+                      animation: 'statusPulse 2.5s ease infinite',
+                    }} />
+                    <Typography sx={{ fontSize: '0.825rem', color: isDark ? '#34D399' : '#059669', fontWeight: 500 }}>
+                      Currently available for new opportunities
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
             </ScrollReveal>
           </Grid>
 
-          {/* ── Right: form ── */}
+          {/* ── Right column: form ── */}
           <Grid size={{ xs: 12, md: 7 }}>
             <ScrollReveal direction="right">
-              <GlassCard hoverEffect={false} accentColor="primary" spotlightColor="rgba(99,102,241,0.06)" neonGlow>
-                <CardContent sx={{ p: { xs: 3, md: 5 } }}>
-                  <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.5, fontFamily: '"Outfit", sans-serif', fontSize: '1.35rem' }}>
-                    Send Me a Message
+              <Box
+                sx={{
+                  height: '100%',
+                  borderRadius: '20px',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'}`,
+                  background: isDark ? '#16161F' : '#FFFFFF',
+                  overflow: 'hidden',
+                  transition: 'border-color 0.2s ease',
+                  '&:hover': {
+                    borderColor: isDark ? 'rgba(139,92,246,0.2)' : 'rgba(124,58,237,0.15)',
+                  },
+                }}
+              >
+                {/* Top gradient band */}
+                <Box sx={{
+                  height: 2,
+                  background: 'linear-gradient(90deg, #38BDF8, #8B5CF6)',
+                }} />
+
+                <Box sx={{ p: { xs: 3, md: 4 } }}>
+                  <Typography
+                    sx={{
+                      fontFamily: '"Outfit", sans-serif',
+                      fontWeight: 700,
+                      fontSize: '1.1rem',
+                      color: 'text.primary',
+                      mb: 0.5,
+                    }}
+                  >
+                    Send a Message
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 4, fontSize: '0.88rem' }}>
-                    I typically respond within 24 hours. ✉️
+                  <Typography sx={{ fontSize: '0.825rem', color: 'text.secondary', mb: 3.5 }}>
+                    I'll get back to you within 24 hours.
                   </Typography>
 
                   <Box component="form" onSubmit={handleSubmit} noValidate>
-                    <Grid container spacing={2.5}>
+                    <Grid container spacing={2}>
                       <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField required fullWidth label="Your Name" name="name" value={formData.name} onChange={handleChange} disabled={status === 'loading'} sx={sx} />
+                        <TextField
+                          required fullWidth
+                          label="Your Name"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          disabled={status === 'loading' || status === 'success'}
+                          size="medium"
+                          sx={fieldSx}
+                        />
                       </Grid>
                       <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField required fullWidth label="Your Email" name="email" type="email" value={formData.email} onChange={handleChange} disabled={status === 'loading'} sx={sx} />
+                        <TextField
+                          required fullWidth
+                          label="Email Address"
+                          name="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          disabled={status === 'loading' || status === 'success'}
+                          size="medium"
+                          sx={fieldSx}
+                        />
                       </Grid>
                       <Grid size={{ xs: 12 }}>
-                        <TextField fullWidth label="Subject" name="subject" value={formData.subject} onChange={handleChange} disabled={status === 'loading'} sx={sx} />
+                        <TextField
+                          fullWidth
+                          label="Subject"
+                          name="subject"
+                          value={formData.subject}
+                          onChange={handleChange}
+                          disabled={status === 'loading' || status === 'success'}
+                          size="medium"
+                          sx={fieldSx}
+                        />
                       </Grid>
                       <Grid size={{ xs: 12 }}>
-                        <TextField required fullWidth multiline rows={5} label="Your Message" name="message" value={formData.message} onChange={handleChange} disabled={status === 'loading'} sx={sx} />
+                        <TextField
+                          required fullWidth multiline rows={5}
+                          label="Message"
+                          name="message"
+                          value={formData.message}
+                          onChange={handleChange}
+                          disabled={status === 'loading' || status === 'success'}
+                          sx={fieldSx}
+                        />
                       </Grid>
                       <Grid size={{ xs: 12 }}>
-                        <motion.div whileHover={status !== 'loading' && status !== 'success' ? { scale: 1.01 } : {}} whileTap={status !== 'loading' && status !== 'success' ? { scale: 0.99 } : {}}>
+                        <motion.div
+                          whileHover={status === 'idle' || status === 'error' ? { scale: 1.01 } : {}}
+                          whileTap={status === 'idle' || status === 'error' ? { scale: 0.99 } : {}}
+                        >
                           <Button
-                            type="submit" variant="contained" fullWidth size="large"
+                            type="submit"
+                            variant="contained"
+                            fullWidth
+                            size="large"
                             disabled={status === 'loading' || status === 'success'}
+                            endIcon={
+                              status === 'loading'
+                                ? <CircularProgress size={16} sx={{ color: 'rgba(255,255,255,0.8)' }} />
+                                : status === 'success'
+                                  ? <CheckCircleIcon sx={{ fontSize: '1rem !important' }} />
+                                  : <ArrowRightAltIcon sx={{ fontSize: '1.2rem !important' }} />
+                            }
                             sx={{
-                              py: 1.9, fontSize: '1rem', fontWeight: 700, borderRadius: '16px',
+                              py: 1.6,
+                              fontSize: '0.9rem',
+                              fontWeight: 700,
+                              borderRadius: '12px',
+                              letterSpacing: '0.01em',
                               background: status === 'success'
-                                ? 'linear-gradient(135deg,#10B981,#059669)'
-                                : 'linear-gradient(135deg,#6366F1 0%,#8B5CF6 50%,#06B6D4 100%)',
-                              backgroundSize: '200% 200%',
-                              boxShadow: status === 'success' ? '0 8px 28px rgba(16,185,129,0.45)' : '0 8px 28px rgba(99,102,241,0.45)',
-                              border: '1px solid rgba(255,255,255,0.15)',
-                              transition: 'all 0.35s ease',
-                              '&:not(:disabled)': {
-                                animation: 'btnShift 4s ease infinite',
-                                '@keyframes btnShift': { '0%,100%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' } },
-                              },
+                                ? 'linear-gradient(135deg, #34D399, #059669)'
+                                : 'linear-gradient(135deg, #7C3AED, #8B5CF6)',
+                              boxShadow: status === 'success'
+                                ? '0 8px 24px rgba(52,211,153,0.4)'
+                                : isDark
+                                  ? '0 8px 24px rgba(139,92,246,0.4)'
+                                  : '0 8px 24px rgba(124,58,237,0.3)',
+                              border: '1px solid rgba(255,255,255,0.1)',
+                              color: '#fff',
+                              transition: 'all 0.25s ease',
                               '&:hover:not(:disabled)': {
-                                boxShadow: '0 12px 36px rgba(99,102,241,0.6)',
-                                transform: 'translateY(-3px)',
+                                background: status === 'success'
+                                  ? 'linear-gradient(135deg, #34D399, #059669)'
+                                  : 'linear-gradient(135deg, #6D28D9, #7C3AED)',
+                                boxShadow: status === 'success'
+                                  ? '0 10px 28px rgba(52,211,153,0.5)'
+                                  : '0 10px 28px rgba(139,92,246,0.5)',
+                                transform: 'translateY(-2px)',
                               },
                               '&.Mui-disabled': {
-                                background: status === 'success' ? 'linear-gradient(135deg,#10B981,#059669)' : undefined,
-                                color: status === 'success' ? '#fff' : undefined,
-                                opacity: status === 'success' ? 1 : 0.55,
+                                color: '#fff',
+                                opacity: status === 'success' ? 1 : 0.6,
+                                background: status === 'success'
+                                  ? 'linear-gradient(135deg, #34D399, #059669)'
+                                  : undefined,
                               },
                             }}
                           >
                             <AnimatePresence mode="wait" initial={false}>
                               {status === 'loading' && (
-                                <motion.div key="loading" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                  <CircularProgress size={18} sx={{ color: '#fff' }} /><span>Sending…</span>
-                                </motion.div>
+                                <motion.span
+                                  key="loading"
+                                  initial={{ opacity: 0, y: 6 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -6 }}
+                                  transition={{ duration: 0.15 }}
+                                >
+                                  Sending…
+                                </motion.span>
                               )}
                               {status === 'success' && (
-                                <motion.div key="success" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                  <CheckCircleIcon sx={{ fontSize: '1.1rem' }} /><span>Message Sent!</span>
-                                </motion.div>
+                                <motion.span
+                                  key="success"
+                                  initial={{ opacity: 0, scale: 0.85 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  exit={{ opacity: 0 }}
+                                  transition={{ duration: 0.2 }}
+                                >
+                                  Message Sent!
+                                </motion.span>
                               )}
                               {(status === 'idle' || status === 'error') && (
-                                <motion.div key="idle" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                  <SendIcon sx={{ fontSize: '1rem' }} /><span>Send Message</span>
-                                </motion.div>
+                                <motion.span
+                                  key="idle"
+                                  initial={{ opacity: 0, y: 6 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -6 }}
+                                  transition={{ duration: 0.15 }}
+                                >
+                                  Send Message
+                                </motion.span>
                               )}
                             </AnimatePresence>
                           </Button>
@@ -268,17 +518,54 @@ export const Contact: React.FC = () => {
                       </Grid>
                     </Grid>
                   </Box>
-                </CardContent>
-              </GlassCard>
+
+                  {/* Trust indicators */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 2,
+                      mt: 3,
+                      pt: 3,
+                      borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+                    }}
+                  >
+                    {[
+                      { icon: '⚡', text: 'Responds within 24h' },
+                      { icon: '🔒', text: 'Your info stays private' },
+                      { icon: '☁', text: 'Open to remote roles' },
+                    ].map(item => (
+                      <Box key={item.text} sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                        <Typography sx={{ fontSize: '0.8rem' }}>{item.icon}</Typography>
+                        <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 500 }}>
+                          {item.text}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+              </Box>
             </ScrollReveal>
           </Grid>
         </Grid>
       </Container>
 
-      <Snackbar open={toastOpen} autoHideDuration={4500} onClose={() => setToastOpen(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-        <Alert onClose={() => setToastOpen(false)} severity={status === 'success' ? 'success' : 'error'} variant="filled"
-          sx={{ borderRadius: '14px', fontWeight: 600, backdropFilter: 'blur(12px)' }}>
-          {status === 'success' ? "Message sent! I'll respond within 24 hours." : 'Please fill in all required fields.'}
+      {/* Toast notifications */}
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={4500}
+        onClose={() => setToastOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setToastOpen(false)}
+          severity={status === 'success' ? 'success' : 'error'}
+          variant="filled"
+          sx={{ borderRadius: '12px', fontWeight: 600, fontSize: '0.875rem' }}
+        >
+          {status === 'success'
+            ? "Message sent! I'll get back to you within 24 hours."
+            : 'Please fill in all required fields.'}
         </Alert>
       </Snackbar>
     </Box>
