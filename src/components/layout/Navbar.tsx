@@ -1,23 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  IconButton,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Box,
-  Container,
-  useTheme,
-  useMediaQuery,
+  AppBar, Toolbar, Typography, Button, IconButton,
+  Drawer, Box, Container, useTheme, useMediaQuery,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import { ThemeToggleButton } from '../common/ThemeToggleButton';
+import { profileInfo } from '../../configs/portfolioData';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavItem {
@@ -25,14 +15,11 @@ interface NavItem {
   id: string;
 }
 
-const navItems: NavItem[] = [
-  { label: 'Home', id: 'hero' },
+const NAV_ITEMS: NavItem[] = [
   { label: 'About', id: 'about' },
-  { label: 'Skills', id: 'skills' },
   { label: 'Experience', id: 'experience' },
   { label: 'Projects', id: 'projects' },
-  { label: 'Achievements', id: 'achievements' },
-  { label: 'Certifications', id: 'certifications' },
+  { label: 'Skills', id: 'skills' },
   { label: 'Contact', id: 'contact' },
 ];
 
@@ -41,160 +28,181 @@ export const Navbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('hero');
   const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // IntersectionObserver for active section tracking
   useEffect(() => {
-    const sectionIds = navItems.map((item) => item.id);
+    const allIds = ['hero', ...NAV_ITEMS.map(i => i.id)];
     const observers: IntersectionObserver[] = [];
 
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
-        }
-      });
-    };
-
-    sectionIds.forEach((id) => {
-      const element = document.getElementById(id);
-      if (element) {
-        const observer = new IntersectionObserver(observerCallback, {
-          rootMargin: '-40% 0px -55% 0px',
-          threshold: 0,
-        });
-        observer.observe(element);
-        observers.push(observer);
-      }
+    allIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) setActiveSection(entry.target.id);
+          });
+        },
+        { rootMargin: '-35% 0px -60% 0px', threshold: 0 }
+      );
+      observer.observe(el);
+      observers.push(observer);
     });
 
-    return () => observers.forEach((obs) => obs.disconnect());
+    return () => observers.forEach(o => o.disconnect());
   }, []);
 
-  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
-
-  const handleScrollToSection = (id: string) => {
+  const scrollTo = useCallback((id: string) => {
     setMobileOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 80;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
-      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+    const el = document.getElementById(id);
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 76;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }, []);
+
+  const bgStyles = scrolled
+    ? {
+      background: isDark
+        ? 'rgba(10,10,15,0.85)'
+        : 'rgba(250,250,250,0.88)',
+      backdropFilter: 'blur(20px) saturate(180%)',
+      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'}`,
+      boxShadow: isDark
+        ? '0 1px 32px rgba(0,0,0,0.5)'
+        : '0 1px 24px rgba(0,0,0,0.07)',
     }
-  };
+    : {
+      background: 'transparent',
+      backdropFilter: 'none',
+      borderBottom: '1px solid transparent',
+      boxShadow: 'none',
+    };
 
   return (
     <>
       <AppBar
         position="fixed"
         sx={{
-          background: scrolled
-            ? theme.palette.mode === 'dark'
-              ? 'rgba(11, 15, 25, 0.88)'
-              : 'rgba(255, 255, 255, 0.88)'
-            : 'transparent',
-          backdropFilter: scrolled ? 'blur(20px) saturate(180%)' : 'none',
-          boxShadow: scrolled
-            ? theme.palette.mode === 'dark'
-              ? '0 1px 0 rgba(255,255,255,0.06), 0 4px 32px rgba(0,0,0,0.4)'
-              : '0 1px 0 rgba(0,0,0,0.06), 0 4px 32px rgba(0,0,0,0.08)'
-            : 'none',
-          borderBottom: scrolled ? `1px solid ${theme.palette.divider}` : '1px solid transparent',
-          transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+          ...bgStyles,
+          transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+          zIndex: theme.zIndex.appBar,
         }}
       >
-        <Container maxWidth="xl">
+        <Container maxWidth="lg">
           <Toolbar
             disableGutters
             sx={{
               justifyContent: 'space-between',
-              height: scrolled ? 68 : 88,
-              transition: 'height 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+              height: scrolled ? 64 : 72,
+              transition: 'height 0.3s ease',
+              gap: 2,
             }}
           >
-            {/* Logo */}
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Typography
-                variant="h5"
-                noWrap
-                component="div"
-                onClick={() => handleScrollToSection('hero')}
-                sx={{
-                  fontFamily: '"Outfit", sans-serif',
-                  fontWeight: 800,
-                  background: theme.palette.gradient?.primary,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  cursor: 'pointer',
-                  letterSpacing: '-0.03em',
-                  userSelect: 'none',
-                }}
+            {/* ── Logo / Monogram ── */}
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+              <Box
+                onClick={() => scrollTo('hero')}
+                sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 1.5, userSelect: 'none' }}
               >
-                SARANKUMAR S
-              </Typography>
+                {/* Monogram badge */}
+                <Box sx={{
+                  width: 34, height: 34, borderRadius: '9px',
+                  background: isDark
+                    ? 'linear-gradient(135deg, #8B5CF6, #38BDF8)'
+                    : 'linear-gradient(135deg, #7C3AED, #0284C7)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
+                  boxShadow: isDark
+                    ? '0 4px 14px rgba(139,92,246,0.4)'
+                    : '0 4px 14px rgba(124,58,237,0.3)',
+                }}>
+                  <Typography sx={{
+                    fontFamily: '"Outfit", sans-serif',
+                    fontWeight: 800,
+                    fontSize: '0.9rem',
+                    color: '#fff',
+                    letterSpacing: '-0.03em',
+                    lineHeight: 1,
+                  }}>
+                    SS
+                  </Typography>
+                </Box>
+
+                {/* Name — hidden on small screens */}
+                {!isMobile && (
+                  <Typography sx={{
+                    fontFamily: '"Outfit", sans-serif',
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    color: 'text.primary',
+                    letterSpacing: '-0.02em',
+                  }}>
+                    Sarankumar<Box component="span" sx={{ color: 'primary.main' }}>.</Box>
+                  </Typography>
+                )}
+              </Box>
             </motion.div>
 
-            {/* Desktop Navigation */}
+            {/* ── Desktop nav ── */}
             {!isMobile && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                {navItems.map((item) => {
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                flex: 1,
+                justifyContent: 'center',
+              }}>
+                {NAV_ITEMS.map(item => {
                   const isActive = activeSection === item.id;
                   return (
                     <Box key={item.id} sx={{ position: 'relative' }}>
                       <Button
-                        onClick={() => handleScrollToSection(item.id)}
+                        onClick={() => scrollTo(item.id)}
                         sx={{
-                          color: isActive ? theme.palette.primary.main : theme.palette.text.primary,
-                          fontSize: '0.9rem',
-                          fontWeight: isActive ? 700 : 600,
-                          px: 1.8,
-                          py: 1,
+                          color: isActive ? 'primary.main' : 'text.secondary',
+                          fontSize: '0.875rem',
+                          fontWeight: isActive ? 600 : 400,
+                          px: 1.5,
+                          py: 0.75,
                           borderRadius: '8px',
-                          background: isActive
-                            ? theme.palette.mode === 'dark'
-                              ? 'rgba(129, 140, 248, 0.12)'
-                              : 'rgba(79, 70, 229, 0.08)'
-                            : 'transparent',
-                          transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                          minWidth: 'auto',
+                          background: 'transparent',
+                          transition: 'all 0.2s ease',
                           '&:hover': {
-                            background:
-                              theme.palette.mode === 'dark'
-                                ? 'rgba(129, 140, 248, 0.15)'
-                                : 'rgba(79, 70, 229, 0.08)',
-                            color: theme.palette.primary.main,
+                            color: 'text.primary',
+                            background: isDark
+                              ? 'rgba(255,255,255,0.05)'
+                              : 'rgba(0,0,0,0.04)',
                           },
                         }}
                       >
                         {item.label}
                       </Button>
-                      {/* Active underline indicator */}
                       <AnimatePresence>
                         {isActive && (
                           <motion.div
-                            layoutId="activeNavIndicator"
+                            layoutId="navIndicator"
                             initial={{ opacity: 0, scaleX: 0 }}
                             animate={{ opacity: 1, scaleX: 1 }}
                             exit={{ opacity: 0, scaleX: 0 }}
-                            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                             style={{
                               position: 'absolute',
-                              bottom: 2,
-                              left: '20%',
-                              right: '20%',
+                              bottom: 1,
+                              left: '15%',
+                              right: '15%',
                               height: 2,
                               borderRadius: 2,
-                              background: theme.palette.gradient?.primary,
+                              background: isDark
+                                ? 'linear-gradient(90deg, #8B5CF6, #38BDF8)'
+                                : 'linear-gradient(90deg, #7C3AED, #0284C7)',
                             }}
                           />
                         )}
@@ -202,21 +210,56 @@ export const Navbar: React.FC = () => {
                     </Box>
                   );
                 })}
-                <Box sx={{ ml: 1.5 }}>
-                  <ThemeToggleButton size="medium" />
-                </Box>
               </Box>
             )}
 
-            {/* Mobile */}
-            {isMobile && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <ThemeToggleButton size="small" />
+            {/* ── Right actions ── */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <ThemeToggleButton size={isMobile ? 'small' : 'medium'} />
+
+              {!isMobile && (
+                <Button
+                  href={profileInfo.resumeUrl}
+                  download
+                  variant="outlined"
+                  size="small"
+                  startIcon={<FileDownloadOutlinedIcon sx={{ fontSize: '1rem !important' }} />}
+                  sx={{
+                    borderRadius: '8px',
+                    px: 2,
+                    py: 0.75,
+                    fontSize: '0.825rem',
+                    fontWeight: 600,
+                    borderColor: isDark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.14)',
+                    color: 'text.primary',
+                    borderWidth: '1px',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      color: 'primary.main',
+                      background: isDark
+                        ? 'rgba(139,92,246,0.08)'
+                        : 'rgba(124,58,237,0.06)',
+                      borderWidth: '1px',
+                    },
+                  }}
+                >
+                  Resume
+                </Button>
+              )}
+
+              {isMobile && (
                 <IconButton
-                  color="inherit"
-                  aria-label="open drawer"
-                  onClick={handleDrawerToggle}
-                  sx={{ color: theme.palette.text.primary }}
+                  onClick={() => setMobileOpen(v => !v)}
+                  size="small"
+                  aria-label="menu"
+                  sx={{
+                    width: 36, height: 36, borderRadius: '8px',
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                    color: 'text.primary',
+                    '&:hover': {
+                      background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                    },
+                  }}
                 >
                   <AnimatePresence mode="wait" initial={false}>
                     <motion.div
@@ -224,118 +267,128 @@ export const Navbar: React.FC = () => {
                       initial={{ rotate: -90, opacity: 0 }}
                       animate={{ rotate: 0, opacity: 1 }}
                       exit={{ rotate: 90, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
+                      transition={{ duration: 0.15 }}
                       style={{ display: 'flex' }}
                     >
-                      {mobileOpen ? <CloseIcon /> : <MenuIcon />}
+                      {mobileOpen ? <CloseIcon sx={{ fontSize: '1.1rem' }} /> : <MenuIcon sx={{ fontSize: '1.1rem' }} />}
                     </motion.div>
                   </AnimatePresence>
                 </IconButton>
-              </Box>
-            )}
+              )}
+            </Box>
           </Toolbar>
         </Container>
       </AppBar>
 
-      {/* Mobile Drawer */}
+      {/* ── Mobile Drawer ── */}
       <Drawer
         anchor="right"
         open={mobileOpen}
-        onClose={handleDrawerToggle}
+        onClose={() => setMobileOpen(false)}
         ModalProps={{ keepMounted: true }}
         slotProps={{
           paper: {
             sx: {
-              width: 280,
-              background:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(11, 15, 25, 0.97)'
-                  : 'rgba(255, 255, 255, 0.97)',
-              backdropFilter: 'blur(20px)',
-              borderLeft: `1px solid ${theme.palette.divider}`,
-              p: 3,
+              width: 260,
+              background: isDark ? '#111118' : '#FFFFFF',
+              borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'}`,
             },
           },
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Typography
-            variant="h6"
-            sx={{
-              fontFamily: '"Outfit", sans-serif',
-              fontWeight: 800,
-              background: theme.palette.gradient?.primary,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          >
-            Navigation
-          </Typography>
-          <IconButton onClick={handleDrawerToggle} size="small">
-            <CloseIcon />
-          </IconButton>
-        </Box>
+        <Box sx={{ p: 3 }}>
+          {/* Header */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Box sx={{
+                width: 32, height: 32, borderRadius: '8px',
+                background: 'linear-gradient(135deg, #8B5CF6, #38BDF8)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Typography sx={{
+                  fontFamily: '"Outfit", sans-serif',
+                  fontWeight: 800, fontSize: '0.82rem', color: '#fff',
+                }}>SS</Typography>
+              </Box>
+              <Typography sx={{
+                fontFamily: '"Outfit", sans-serif',
+                fontWeight: 700, fontSize: '0.95rem',
+                color: 'text.primary',
+              }}>
+                Sarankumar<Box component="span" sx={{ color: 'primary.main' }}>.</Box>
+              </Typography>
+            </Box>
+            <IconButton size="small" onClick={() => setMobileOpen(false)} sx={{ color: 'text.secondary' }}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Box>
 
-        <List sx={{ p: 0 }}>
-          {navItems.map((item, index) => {
-            const isActive = activeSection === item.id;
-            return (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <ListItem disablePadding sx={{ mb: 0.5 }}>
-                  <ListItemButton
-                    onClick={() => handleScrollToSection(item.id)}
+          {/* Nav items */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 4 }}>
+            {NAV_ITEMS.map((item, i) => {
+              const isActive = activeSection === item.id;
+              return (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05, duration: 0.2 }}
+                >
+                  <Box
+                    onClick={() => scrollTo(item.id)}
                     sx={{
-                      borderRadius: '10px',
+                      px: 2, py: 1.25, borderRadius: '10px', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 2,
                       background: isActive
-                        ? theme.palette.mode === 'dark'
-                          ? 'rgba(129, 140, 248, 0.12)'
-                          : 'rgba(79, 70, 229, 0.08)'
+                        ? isDark ? 'rgba(139,92,246,0.1)' : 'rgba(124,58,237,0.07)'
                         : 'transparent',
                       borderLeft: isActive
-                        ? `3px solid ${theme.palette.primary.main}`
-                        : '3px solid transparent',
-                      transition: 'all 0.2s',
+                        ? `2px solid ${isDark ? '#8B5CF6' : '#7C3AED'}`
+                        : '2px solid transparent',
+                      transition: 'all 0.15s ease',
                       '&:hover': {
-                        background:
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(129, 140, 248, 0.15)'
-                            : 'rgba(79, 70, 229, 0.08)',
+                        background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                        color: 'primary.main',
                       },
                     }}
                   >
-                    <ListItemText
-                      primary={
-                        <Typography
-                          sx={{
-                            fontSize: '1rem',
-                            fontWeight: isActive ? 700 : 600,
-                            color: isActive ? theme.palette.primary.main : theme.palette.text.primary,
-                          }}
-                        >
-                          {item.label}
-                        </Typography>
-                      }
-                    />
-                  </ListItemButton>
-                </ListItem>
-              </motion.div>
-            );
-          })}
-        </List>
+                    <Typography sx={{
+                      fontSize: '0.95rem',
+                      fontWeight: isActive ? 600 : 400,
+                      color: isActive ? 'primary.main' : 'text.primary',
+                    }}>
+                      {item.label}
+                    </Typography>
+                  </Box>
+                </motion.div>
+              );
+            })}
+          </Box>
 
-        <Box
-          sx={{
-            pt: 4,
-            borderTop: `1px solid ${theme.palette.divider}`,
-            mt: 4,
-          }}
-        >
-          <Typography variant="caption" color="text.secondary">
+          {/* Resume button */}
+          <Button
+            href={profileInfo.resumeUrl}
+            download
+            fullWidth
+            variant="outlined"
+            startIcon={<FileDownloadOutlinedIcon />}
+            sx={{
+              borderRadius: '10px', py: 1.25,
+              fontWeight: 600,
+              borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
+              color: 'text.primary',
+              mb: 4,
+              '&:hover': {
+                borderColor: 'primary.main',
+                color: 'primary.main',
+                background: 'rgba(139,92,246,0.06)',
+              },
+            }}
+          >
+            Download Resume
+          </Button>
+
+          <Typography variant="caption" sx={{ color: 'text.disabled' }}>
             © {new Date().getFullYear()} Sarankumar S
           </Typography>
         </Box>

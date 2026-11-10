@@ -7,55 +7,68 @@ interface LayoutProps {
   children: ReactNode;
 }
 
-// Static CSS-only aurora blobs — no JS animation, GPU-composited via CSS
-// Using CSS animations instead of Framer Motion repeat:Infinity eliminates
-// the JS thread involvement entirely after the first paint.
 const GLOBAL_KEYFRAMES = (
   <GlobalStyles styles={{
-    '@keyframes auroraBlob1': {
-      '0%,100%': { transform: 'translate(0,0) scale(1)', opacity: 0.5 },
-      '33%': { transform: 'translate(30px,-25px) scale(1.12)', opacity: 0.65 },
-      '66%': { transform: 'translate(-20px,20px) scale(0.95)', opacity: 0.55 },
-    },
-    '@keyframes auroraBlob2': {
-      '0%,100%': { transform: 'translate(0,0) scale(1)', opacity: 0.45 },
-      '40%': { transform: 'translate(-25px,-20px) scale(1.1)', opacity: 0.6 },
-      '70%': { transform: 'translate(20px,15px) scale(0.96)', opacity: 0.5 },
-    },
-    '@keyframes auroraBlob3': {
-      '0%,100%': { transform: 'translate(0,0) scale(1)', opacity: 0.4 },
-      '50%': { transform: 'translate(15px,-15px) scale(1.08)', opacity: 0.55 },
-    },
-    '@keyframes auroraBlob4': {
-      '0%,100%': { transform: 'translate(0,0) scale(1)', opacity: 0.35 },
-      '45%': { transform: 'translate(-10px,12px) scale(1.06)', opacity: 0.48 },
-    },
-    // Global reusable keyframes used across many components via sx
-    '@keyframes heroPulse': {
-      '0%,100%': { boxShadow: '0 0 8px currentColor' },
-      '50%': { boxShadow: '0 0 18px currentColor, 0 0 30px currentColor' },
-    },
-    '@keyframes spinSlow': {
-      to: { transform: 'rotate(360deg)' },
-    },
-    '@keyframes spinSlowReverse': {
-      to: { transform: 'rotate(-360deg)' },
-    },
-    '@keyframes auroraShift': {
+    // Gradient text animation
+    '@keyframes gradientShift': {
       '0%,100%': { backgroundPosition: '0% 50%' },
       '50%': { backgroundPosition: '100% 50%' },
     },
+    // Subtle pulse for status indicators
+    '@keyframes statusPulse': {
+      '0%,100%': { opacity: 1, transform: 'scale(1)' },
+      '50%': { opacity: 0.6, transform: 'scale(0.9)' },
+    },
+    // Scroll bob
+    '@keyframes scrollBob': {
+      '0%,100%': { transform: 'translateY(0)' },
+      '50%': { transform: 'translateY(6px)' },
+    },
+    // Cursor blink
+    '@keyframes cursorBlink': {
+      '0%,100%': { opacity: 1 },
+      '50%': { opacity: 0 },
+    },
+    // Ambient orb drift
+    '@keyframes orbDrift1': {
+      '0%,100%': { transform: 'translate(0,0) scale(1)' },
+      '33%': { transform: 'translate(40px,-30px) scale(1.1)' },
+      '66%': { transform: 'translate(-25px,20px) scale(0.95)' },
+    },
+    '@keyframes orbDrift2': {
+      '0%,100%': { transform: 'translate(0,0) scale(1)' },
+      '40%': { transform: 'translate(-35px,-25px) scale(1.08)' },
+      '70%': { transform: 'translate(20px,18px) scale(0.97)' },
+    },
+    '@keyframes orbDrift3': {
+      '0%,100%': { transform: 'translate(0,0) scale(1)' },
+      '50%': { transform: 'translate(18px,-18px) scale(1.06)' },
+    },
+    // Orbit rotation
+    '@keyframes orbitSpin': { to: { transform: 'rotate(360deg)' } },
+    '@keyframes orbitSpinReverse': { to: { transform: 'rotate(-360deg)' } },
+    // Live dot pulse
     '@keyframes livePulse': {
       '0%,100%': { opacity: 1 },
       '50%': { opacity: 0.3 },
     },
-    '@keyframes expPulse': {
-      '0%,100%': { opacity: 1 },
-      '50%': { opacity: 0.4 },
-    },
-    '@keyframes btnShift': {
+    // Button gradient shift
+    '@keyframes btnGradient': {
       '0%,100%': { backgroundPosition: '0% 50%' },
       '50%': { backgroundPosition: '100% 50%' },
+    },
+    // Float for stat cards
+    '@keyframes float0': {
+      '0%,100%': { transform: 'translateY(0px)' },
+      '50%': { transform: 'translateY(-8px)' },
+    },
+    '@keyframes float1': {
+      '0%,100%': { transform: 'translateY(0px)' },
+      '50%': { transform: 'translateY(-10px)' },
+    },
+    '@keyframes float2': {
+      '0%,100%': { transform: 'translateY(0px)' },
+      '50%': { transform: 'translateY(-7px)' },
     },
   }} />
 );
@@ -72,69 +85,80 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           display: 'flex',
           flexDirection: 'column',
           minHeight: '100vh',
-          background: isDark ? '#060912' : '#F0F4FF',
+          background: isDark ? '#0A0A0F' : '#FAFAFA',
           color: theme.palette.text.primary,
-          transition: 'background 0.4s ease, color 0.4s ease',
+          transition: 'background 0.3s ease, color 0.3s ease',
           position: 'relative',
           overflowX: 'hidden',
         }}
       >
-        {/* ── Aurora blobs: pure CSS animation, no JS thread ── */}
+        {/* Ambient background orbs — pure CSS, GPU composited */}
         <Box sx={{
-          position: 'fixed', top: -150, right: -200, width: 700, height: 700,
-          borderRadius: '50%', pointerEvents: 'none', zIndex: 0,
+          position: 'fixed',
+          top: '-10%', right: '-10%',
+          width: 600, height: 600,
+          borderRadius: '50%',
           background: isDark
-            ? 'radial-gradient(circle, rgba(99,102,241,0.2) 0%, rgba(139,92,246,0.1) 50%, transparent 70%)'
-            : 'radial-gradient(circle, rgba(99,102,241,0.14) 0%, rgba(139,92,246,0.07) 50%, transparent 70%)',
-          filter: 'blur(70px)',
-          animation: 'auroraBlob1 18s ease-in-out infinite',
+            ? 'radial-gradient(circle, rgba(139,92,246,0.14) 0%, rgba(139,92,246,0.04) 50%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(124,58,237,0.1) 0%, rgba(124,58,237,0.03) 50%, transparent 70%)',
+          filter: 'blur(80px)',
+          animation: 'orbDrift1 20s ease-in-out infinite',
           willChange: 'transform',
+          pointerEvents: 'none',
+          zIndex: 0,
         }} />
         <Box sx={{
-          position: 'fixed', top: '30%', left: -200, width: 600, height: 600,
-          borderRadius: '50%', pointerEvents: 'none', zIndex: 0,
+          position: 'fixed',
+          top: '40%', left: '-10%',
+          width: 500, height: 500,
+          borderRadius: '50%',
           background: isDark
-            ? 'radial-gradient(circle, rgba(6,182,212,0.15) 0%, rgba(52,211,153,0.08) 50%, transparent 70%)'
-            : 'radial-gradient(circle, rgba(6,182,212,0.1) 0%, rgba(16,185,129,0.06) 50%, transparent 70%)',
-          filter: 'blur(70px)',
-          animation: 'auroraBlob2 22s ease-in-out infinite',
+            ? 'radial-gradient(circle, rgba(56,189,248,0.1) 0%, rgba(56,189,248,0.03) 50%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(2,132,199,0.07) 0%, rgba(2,132,199,0.02) 50%, transparent 70%)',
+          filter: 'blur(80px)',
+          animation: 'orbDrift2 25s ease-in-out infinite',
           willChange: 'transform',
+          pointerEvents: 'none',
+          zIndex: 0,
         }} />
         <Box sx={{
-          position: 'fixed', bottom: '5%', right: -100, width: 500, height: 500,
-          borderRadius: '50%', pointerEvents: 'none', zIndex: 0,
+          position: 'fixed',
+          bottom: '5%', right: '15%',
+          width: 400, height: 400,
+          borderRadius: '50%',
           background: isDark
-            ? 'radial-gradient(circle, rgba(244,63,94,0.12) 0%, rgba(236,72,153,0.07) 50%, transparent 70%)'
-            : 'radial-gradient(circle, rgba(244,63,94,0.08) 0%, rgba(236,72,153,0.05) 50%, transparent 70%)',
-          filter: 'blur(70px)',
-          animation: 'auroraBlob3 16s ease-in-out infinite',
+            ? 'radial-gradient(circle, rgba(52,211,153,0.07) 0%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(5,150,105,0.05) 0%, transparent 70%)',
+          filter: 'blur(80px)',
+          animation: 'orbDrift3 18s ease-in-out infinite',
           willChange: 'transform',
-        }} />
-        <Box sx={{
-          position: 'fixed', top: '60%', left: '40%', width: 400, height: 400,
-          borderRadius: '50%', pointerEvents: 'none', zIndex: 0,
-          background: isDark
-            ? 'radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%)'
-            : 'radial-gradient(circle, rgba(245,158,11,0.05) 0%, transparent 70%)',
-          filter: 'blur(70px)',
-          animation: 'auroraBlob4 25s ease-in-out infinite',
-          willChange: 'transform',
+          pointerEvents: 'none',
+          zIndex: 0,
         }} />
 
-        {/* ── Dot grid — static, no animation ── */}
+        {/* Subtle dot grid pattern */}
         <Box sx={{
           position: 'fixed', inset: 0,
           backgroundImage: isDark
-            ? 'radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)'
-            : 'radial-gradient(rgba(0,0,0,0.05) 1px, transparent 1px)',
-          backgroundSize: '32px 32px',
-          pointerEvents: 'none', zIndex: 0,
-          maskImage: 'radial-gradient(ellipse 90% 80% at 50% 50%, black 30%, transparent 100%)',
+            ? 'radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px)'
+            : 'radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px)',
+          backgroundSize: '28px 28px',
+          pointerEvents: 'none',
+          zIndex: 0,
+          maskImage: 'radial-gradient(ellipse 80% 70% at 50% 50%, black 20%, transparent 100%)',
         }} />
 
         <Navbar />
 
-        <Box component="main" sx={{ flexGrow: 1, pt: { xs: 10, md: 12 }, zIndex: 1, position: 'relative' }}>
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            pt: { xs: 9, md: 11 },
+            zIndex: 1,
+            position: 'relative',
+          }}
+        >
           {children}
         </Box>
 

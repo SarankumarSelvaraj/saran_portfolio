@@ -15,7 +15,7 @@ export const profileInfo: ProfileInfo = {
   summary:
     'Results-driven Full-Stack and Mobile Developer with 3+ years of experience at SRM Tech designing and delivering production-grade web and mobile applications. Specializes in the MERN stack with deep expertise in React Native cross-platform mobile development, TypeScript, and RESTful API architecture. Architected a 5-application healthcare super-app ecosystem (HealthMate) and an AI-powered meeting intelligence platform (SmartMeet) with real-time WebSocket transcription, IoT device integration, and AWS S3 pipelines.',
   avatarUrl: '',
-  resumeUrl: '#',
+  resumeUrl: '/Sarankumar_SoftwareEngineer_Resume.pdf',
   socialLinks: [
     { platform: 'GitHub', url: 'https://github.com/SarankumarSelvaraj', icon: 'GitHub' },
     { platform: 'LinkedIn', url: 'https://linkedin.com/in/sarankumar-s-649979219', icon: 'LinkedIn' },

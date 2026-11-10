@@ -1,92 +1,108 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, useTheme } from '@mui/material';
-import SecurityIcon from '@mui/icons-material/Security';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import OfflineBoltIcon from '@mui/icons-material/OfflineBolt';
-import LanguageIcon from '@mui/icons-material/Language';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import WidgetsIcon from '@mui/icons-material/Widgets';
-import NavigationIcon from '@mui/icons-material/Navigation';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { engineeringAchievements } from '../../configs/portfolioData';
-import { GlassCard } from '../common/GlassCard';
-import { ScrollReveal } from '../common/ScrollReveal';
 import { SectionHeading } from '../common/SectionHeading';
+import { ScrollReveal } from '../common/ScrollReveal';
 import { motion } from 'framer-motion';
 
-const CARD_GRADIENTS = [
-  { gradient: 'linear-gradient(135deg,#6366F1,#8B5CF6)', neon: 'rgba(99,102,241,.4)', accent: 'violet' as const },
-  { gradient: 'linear-gradient(135deg,#10B981,#06B6D4)', neon: 'rgba(16,185,129,.4)', accent: 'secondary' as const },
-  { gradient: 'linear-gradient(135deg,#F59E0B,#F97316)', neon: 'rgba(245,158,11,.4)', accent: 'amber' as const },
-  { gradient: 'linear-gradient(135deg,#EC4899,#F43F5E)', neon: 'rgba(236,72,153,.4)', accent: 'rose' as const },
-  { gradient: 'linear-gradient(135deg,#06B6D4,#3B82F6)', neon: 'rgba(6,182,212,.4)', accent: 'cyan' as const },
-  { gradient: 'linear-gradient(135deg,#8B5CF6,#6366F1)', neon: 'rgba(139,92,246,.4)', accent: 'violet' as const },
-  { gradient: 'linear-gradient(135deg,#F97316,#EF4444)', neon: 'rgba(249,115,22,.4)', accent: 'amber' as const },
-];
-
-const ICON_MAP: Record<string, React.ReactNode> = {
-  Security: <SecurityIcon sx={{ fontSize: 28, color: '#fff' }} />,
-  CloudUpload: <CloudUploadIcon sx={{ fontSize: 28, color: '#fff' }} />,
-  OfflineBolt: <OfflineBoltIcon sx={{ fontSize: 28, color: '#fff' }} />,
-  Language: <LanguageIcon sx={{ fontSize: 28, color: '#fff' }} />,
-  PictureAsPdf: <PictureAsPdfIcon sx={{ fontSize: 28, color: '#fff' }} />,
-  Widgets: <WidgetsIcon sx={{ fontSize: 28, color: '#fff' }} />,
-  Navigation: <NavigationIcon sx={{ fontSize: 28, color: '#fff' }} />,
+/* Icon map — using text symbols to avoid extra MUI icon imports */
+const ICON_MAP: Record<string, string> = {
+  Security: '🔐',
+  CloudUpload: '☁',
+  OfflineBolt: '⚡',
+  Language: '🌐',
+  PictureAsPdf: '📄',
+  Widgets: '◈',
+  Lock: '🔒',
+  Speed: '◎',
+  Navigation: '◇',
 };
+
+const CARD_COLORS = [
+  { color: '#8B5CF6', dimColor: 'rgba(139,92,246,0.1)', borderColor: 'rgba(139,92,246,0.2)' },
+  { color: '#38BDF8', dimColor: 'rgba(56,189,248,0.1)', borderColor: 'rgba(56,189,248,0.2)' },
+  { color: '#34D399', dimColor: 'rgba(52,211,153,0.1)', borderColor: 'rgba(52,211,153,0.2)' },
+  { color: '#FBBF24', dimColor: 'rgba(251,191,36,0.1)', borderColor: 'rgba(251,191,36,0.2)' },
+  { color: '#FB7185', dimColor: 'rgba(251,113,133,0.1)', borderColor: 'rgba(251,113,133,0.2)' },
+  { color: '#A78BFA', dimColor: 'rgba(167,139,250,0.1)', borderColor: 'rgba(167,139,250,0.2)' },
+  { color: '#6EE7B7', dimColor: 'rgba(110,231,183,0.1)', borderColor: 'rgba(110,231,183,0.2)' },
+  { color: '#FCD34D', dimColor: 'rgba(252,211,77,0.1)', borderColor: 'rgba(252,211,77,0.2)' },
+];
 
 export const Achievements: React.FC = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
   return (
-    <Box id="achievements" sx={{ py: { xs: 8, md: 14 }, position: 'relative' }}>
+    <Box id="achievements" sx={{ py: { xs: 10, md: 16 }, position: 'relative' }}>
       <Container maxWidth="lg">
         <SectionHeading
-          index="06"
-          eyebrow="Architectural Design"
-          title="Engineering Achievements"
-          subtitle="Real-world technical wins with measurable business impact."
+          index="05"
+          eyebrow="Engineering Highlights"
+          title="What I've Engineered"
+          subtitle="Real architectural wins with measurable business impact — not just features, but systems."
         />
 
-        <Grid container spacing={3.5}>
+        <Grid container spacing={3}>
           {engineeringAchievements.map((ach, i) => {
-            const meta = CARD_GRADIENTS[i % CARD_GRADIENTS.length];
-            const icon = ICON_MAP[ach.iconName] ?? <WidgetsIcon sx={{ fontSize: 28, color: '#fff' }} />;
+            const { color, dimColor, borderColor } = CARD_COLORS[i % CARD_COLORS.length];
+            const icon = ICON_MAP[ach.iconName] ?? '◇';
 
             return (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={i}>
-                <ScrollReveal direction="up" delay={i * 0.08}>
-                  <GlassCard hoverEffect tilt accentColor={meta.accent} spotlightColor={meta.neon} sx={{ height: '100%' }}>
-                    <Box sx={{ p: { xs: 3, md: 4 } }}>
+                <ScrollReveal direction="up" delay={i * 0.07}>
+                  <Box
+                    component={motion.div}
+                    whileHover={{ y: -4 }}
+                    transition={{ duration: 0.2 }}
+                    sx={{
+                      height: '100%',
+                      borderRadius: '16px',
+                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                      background: isDark ? '#16161F' : '#FFFFFF',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        borderColor,
+                        boxShadow: isDark
+                          ? `0 12px 32px rgba(0,0,0,0.4), 0 0 0 1px ${borderColor}`
+                          : `0 12px 32px rgba(0,0,0,0.07), 0 0 0 1px ${borderColor}`,
+                      },
+                    }}
+                  >
+                    {/* Top accent */}
+                    <Box sx={{ height: 2, background: `linear-gradient(90deg, ${color}, ${color}66)` }} />
 
-                      {/* Number + icon row */}
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+                    <Box sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                      {/* Header row */}
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2.5 }}>
                         {/* Card number */}
                         <Typography sx={{
-                          fontFamily: '"Outfit", sans-serif', fontWeight: 900,
-                          fontSize: '3rem', lineHeight: 1, letterSpacing: '-0.05em',
-                          background: meta.gradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                          opacity: 0.25,
+                          fontFamily: '"Outfit", sans-serif',
+                          fontWeight: 900, fontSize: '2.2rem', lineHeight: 1,
+                          color,
+                          opacity: 0.2,
+                          letterSpacing: '-0.05em',
                           userSelect: 'none',
                         }}>
                           {String(i + 1).padStart(2, '0')}
                         </Typography>
 
-                        {/* Icon box with glow */}
+                        {/* Icon box */}
                         <Box
                           component={motion.div}
-                          whileHover={{ scale: 1.12 }}
+                          whileHover={{ scale: 1.1, rotate: 5 }}
                           transition={{ duration: 0.2 }}
                           sx={{
-                            width: 54, height: 54, borderRadius: '16px', flexShrink: 0,
-                            background: meta.gradient,
+                            width: 44, height: 44, borderRadius: '11px',
+                            background: isDark ? dimColor : dimColor.replace('0.1', '0.08'),
+                            border: `1px solid ${borderColor}`,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: `0 8px 24px ${meta.neon}`,
-                            position: 'relative',
-                            '&::after': {
-                              content: '""', position: 'absolute', inset: 0, borderRadius: '16px',
-                              background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 60%)',
-                            },
+                            fontSize: '1.2rem',
+                            flexShrink: 0,
                           }}
                         >
                           {icon}
@@ -94,40 +110,69 @@ export const Achievements: React.FC = () => {
                       </Box>
 
                       {/* Title */}
-                      <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.05rem', lineHeight: 1.35, mb: 1.5 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: '0.95rem',
+                          lineHeight: 1.35,
+                          color: 'text.primary',
+                          mb: 1.25,
+                        }}
+                      >
                         {ach.title}
                       </Typography>
 
                       {/* Description */}
-                      <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.75, mb: 2.5, fontSize: '0.87rem' }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: 'text.secondary',
+                          lineHeight: 1.75,
+                          fontSize: '0.835rem',
+                          mb: 2.5,
+                          flexGrow: 1,
+                        }}
+                      >
                         {ach.description}
                       </Typography>
 
-                      {/* Impact banner */}
+                      {/* Impact block */}
                       {ach.impact && (
-                        <Box sx={{
-                          px: 2, py: 1.5, borderRadius: '12px',
-                          background: isDark ? `${meta.neon.replace('0.4', '0.08')}` : `${meta.neon.replace('0.4', '0.06')}`,
-                          border: `1px solid ${meta.neon.replace('0.4', '0.25')}`,
-                          display: 'flex', alignItems: 'flex-start', gap: 1.5,
-                        }}>
-                          <TrendingUpIcon sx={{ fontSize: '1rem', mt: 0.2, flexShrink: 0, color: meta.gradient.match(/#[0-9A-Fa-f]{6}/)?.[0] ?? 'secondary.main' }} />
-                          <Box>
-                            <Typography variant="caption" sx={{
-                              fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em',
-                              display: 'block', mb: 0.3, fontSize: '0.62rem',
-                              color: meta.gradient.match(/#[0-9A-Fa-f]{6}/)?.[0],
+                        <Box
+                          sx={{
+                            p: 2,
+                            borderRadius: '10px',
+                            background: isDark
+                              ? dimColor.replace('0.1', '0.07')
+                              : dimColor.replace('0.1', '0.05'),
+                            border: `1px solid ${borderColor.replace('0.2', '0.15')}`,
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                            <ArrowRightAltIcon sx={{ fontSize: '0.9rem', color, flexShrink: 0 }} />
+                            <Typography sx={{
+                              fontSize: '0.62rem',
+                              fontWeight: 700,
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.1em',
+                              color,
                             }}>
                               Impact
                             </Typography>
-                            <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600, fontSize: '0.83rem', lineHeight: 1.5 }}>
-                              {ach.impact}
-                            </Typography>
                           </Box>
+                          <Typography sx={{
+                            fontSize: '0.8rem',
+                            color: 'text.primary',
+                            fontWeight: 500,
+                            lineHeight: 1.6,
+                          }}>
+                            {ach.impact}
+                          </Typography>
                         </Box>
                       )}
                     </Box>
-                  </GlassCard>
+                  </Box>
                 </ScrollReveal>
               </Grid>
             );
