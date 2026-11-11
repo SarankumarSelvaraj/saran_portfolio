@@ -1,10 +1,9 @@
 import React from 'react';
 import {
-  Box, Container, Typography, Grid, Stack, useTheme, Button,
+  Box, Container, Typography, Grid, Stack, useTheme,
 } from '@mui/material';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import StarIcon from '@mui/icons-material/Star';
 import { certifications, awards } from '../../configs/portfolioData';
@@ -14,37 +13,58 @@ import { motion } from 'framer-motion';
 
 /* Issuer config */
 interface IssuerMeta {
-  color: string;
-  dimColor: string;
-  borderColor: string;
+  lightColor: string;
+  darkColor: string;
+  lightDimColor: string;
+  darkDimColor: string;
+  lightBorderColor: string;
+  darkBorderColor: string;
   abbr: string;
 }
 
 const ISSUER_META: Record<string, IssuerMeta> = {
+  // freeCodeCamp Style Guide: Success & Passed Tests
+  // Light → #00471b (Dark Green), Dark → #acd157 (Light Green)
   freecodecamp: {
-    color: '#F03000',
-    dimColor: 'rgba(240,48,0,0.1)',
-    borderColor: 'rgba(240,48,0,0.2)',
+    lightColor: '#00471b',
+    darkColor: '#acd157',
+    lightDimColor: 'rgba(0,71,27,0.08)',
+    darkDimColor: 'rgba(172,209,87,0.1)',
+    lightBorderColor: 'rgba(0,71,27,0.18)',
+    darkBorderColor: 'rgba(172,209,87,0.22)',
     abbr: '{ }',
   },
+  // Anthropic: Editorial Highlights / Warm Clay brand
+  // Light → #c6613f (Deep Clay), Dark → #d97757 (Terracotta)
   anthropic: {
-    color: '#FBBF24',
-    dimColor: 'rgba(251,191,36,0.1)',
-    borderColor: 'rgba(251,191,36,0.2)',
+    lightColor: '#c6613f',
+    darkColor: '#d97757',
+    lightDimColor: 'rgba(198,97,63,0.08)',
+    darkDimColor: 'rgba(217,119,87,0.1)',
+    lightBorderColor: 'rgba(198,97,63,0.18)',
+    darkBorderColor: 'rgba(217,119,87,0.22)',
     abbr: 'A',
   },
+  // Cisco: Primary Brand / Cisco Blue
+  // Light → #049fd9 (Cisco Blue), Dark → #00bceb (Sky Blue)
   cisco: {
-    color: '#38BDF8',
-    dimColor: 'rgba(56,189,248,0.1)',
-    borderColor: 'rgba(56,189,248,0.2)',
+    lightColor: '#049fd9',
+    darkColor: '#00bceb',
+    lightDimColor: 'rgba(4,159,217,0.08)',
+    darkDimColor: 'rgba(0,188,235,0.1)',
+    lightBorderColor: 'rgba(4,159,217,0.18)',
+    darkBorderColor: 'rgba(0,188,235,0.22)',
     abbr: '⌘',
   },
 };
 
 const DEFAULT_META: IssuerMeta = {
-  color: '#8B5CF6',
-  dimColor: 'rgba(139,92,246,0.1)',
-  borderColor: 'rgba(139,92,246,0.2)',
+  lightColor: '#7C3AED',
+  darkColor: '#8B5CF6',
+  lightDimColor: 'rgba(124,58,237,0.08)',
+  darkDimColor: 'rgba(139,92,246,0.1)',
+  lightBorderColor: 'rgba(124,58,237,0.18)',
+  darkBorderColor: 'rgba(139,92,246,0.2)',
   abbr: '✦',
 };
 
@@ -55,9 +75,6 @@ const getIssuerMeta = (issuer: string): IssuerMeta => {
   }
   return DEFAULT_META;
 };
-
-const isVerifiable = (url: string | undefined): url is string =>
-  !!url && !url.includes('anthropic.com') && !url.includes('netacad.com');
 
 export const Certifications: React.FC = () => {
   const theme = useTheme();
@@ -108,7 +125,9 @@ export const Certifications: React.FC = () => {
             <Stack spacing={1.5}>
               {certifications.map((cert, i) => {
                 const meta = getIssuerMeta(cert.issuer);
-                const verifiable = isVerifiable(cert.credentialUrl);
+                const color = isDark ? meta.darkColor : meta.lightColor;
+                const dimColor = isDark ? meta.darkDimColor : meta.lightDimColor;
+                const borderColor = isDark ? meta.darkBorderColor : meta.lightBorderColor;
 
                 return (
                   <motion.div
@@ -129,7 +148,7 @@ export const Certifications: React.FC = () => {
                         background: isDark ? '#16161F' : '#FFFFFF',
                         transition: 'all 0.2s ease',
                         '&:hover': {
-                          borderColor: meta.borderColor,
+                          borderColor,
                           transform: 'translateX(4px)',
                           boxShadow: isDark
                             ? `0 4px 20px rgba(0,0,0,0.3)`
@@ -140,13 +159,13 @@ export const Certifications: React.FC = () => {
                       {/* Issuer badge */}
                       <Box sx={{
                         width: 44, height: 44, borderRadius: '10px', flexShrink: 0,
-                        background: isDark ? meta.dimColor : meta.dimColor.replace('0.1', '0.08'),
-                        border: `1px solid ${meta.borderColor}`,
+                        background: dimColor,
+                        border: `1px solid ${borderColor}`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontFamily: '"Outfit", sans-serif',
                         fontWeight: 800,
                         fontSize: meta.abbr.length > 2 ? '0.9rem' : '1rem',
-                        color: meta.color,
+                        color,
                       }}>
                         {meta.abbr}
                       </Box>
@@ -154,7 +173,7 @@ export const Certifications: React.FC = () => {
                       {/* Text */}
                       <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.3 }}>
-                          <VerifiedIcon sx={{ fontSize: '0.8rem', color: meta.color, flexShrink: 0 }} />
+                          <VerifiedIcon sx={{ fontSize: '0.8rem', color, flexShrink: 0 }} />
                           <Typography sx={{
                             fontWeight: 600, fontSize: '0.875rem',
                             color: 'text.primary', lineHeight: 1.3,
@@ -168,7 +187,7 @@ export const Certifications: React.FC = () => {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                           <Box sx={{
                             width: 5, height: 5, borderRadius: '50%',
-                            background: meta.color, flexShrink: 0,
+                            background: color, flexShrink: 0,
                           }} />
                           <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 500 }}>
                             {cert.issuer}
@@ -190,29 +209,6 @@ export const Certifications: React.FC = () => {
                               {cert.issueDate}
                             </Typography>
                           </Box>
-                        )}
-                        {verifiable && (
-                          <Button
-                            href={cert.credentialUrl!}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            size="small"
-                            endIcon={<OpenInNewIcon sx={{ fontSize: '0.65rem !important' }} />}
-                            sx={{
-                              px: 1.25, py: 0.3, borderRadius: '6px',
-                              fontSize: '0.65rem', fontWeight: 600,
-                              color: meta.color,
-                              background: isDark ? meta.dimColor : meta.dimColor.replace('0.1', '0.07'),
-                              border: `1px solid ${meta.borderColor}`,
-                              minWidth: 'auto',
-                              '&:hover': {
-                                background: meta.dimColor.replace('0.1', '0.18'),
-                                transform: 'none',
-                              },
-                            }}
-                          >
-                            Verify
-                          </Button>
                         )}
                       </Box>
                     </Box>
